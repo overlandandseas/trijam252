@@ -1,2 +1,6 @@
 zrayjam
 *.o
+*.js
+*.html
+*.wasm
+*.a
