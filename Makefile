@@ -20,7 +20,7 @@ LFLAGS += -L$(RAYLIB_PATH) -lc -lraylib_$(PLATFORM)
 
 ifeq ($(PLATFORM),PLATFORM_WEB)
 	ZFLAGS += -Dtarget=wasm32-emscripten --sysroot $(EMSDK_PATH)/upstream/emscripten
-	LFLAGS += -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -s WASM=1 -s USE_WEBGL2=1
+#	LFLAGS += -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -s WASM=1 -s USE_WEBGL2=1
 endif
 
 BIN ?= zrayjam
