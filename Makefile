@@ -49,7 +49,7 @@ else ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 endif
 
 # final artifact
-$(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH)
+$(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH) main.zig
 ifeq ($(PLATFORM),PLATFORM_WEB)
 	emcc -c entry.c
 	zig build-lib --name $(BIN) main.zig $(ZFLAGS) $(IFLAGS) $(LFLAGS)
@@ -65,3 +65,12 @@ $(RAYLIB_BIN_PATH):
 	make -C $(RAYLIB_PATH) clean
 	make -C $(RAYLIB_PATH)
 	mv $(RAYLIB_PATH)/$(RAYLIB_BIN) $(RAYLIB_PATH)/$(RAYLIB_PLAT_BIN)
+
+clean:
+	rm -f *.o
+	rm -f *.a
+	rm -f *.html
+	rm -f *.js
+	rm -f *.wasm
+	rm -f *.exe
+	rm -f $(BIN)
