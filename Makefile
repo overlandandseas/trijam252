@@ -29,6 +29,32 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
 	BIN_MODE = build-lib
 	FINAL_BIN = zrayjam.wasm
 	ZFLAGS += -target wasm32-freestanding --sysroot $(EMSDK_PATH)/upstream/emscripten
+else ifeq ($(PLATFORM),PLATFORM_DESKTOP)
+    ifeq ($(OS),Windows_NT)
+        PLATFORM_OS = WINDOWS
+    else
+        UNAMEOS = $(shell uname)
+        ifeq ($(UNAMEOS),Linux)
+            PLATFORM_OS = LINUX
+			LFLAGS += -lGL -lrt -ldl -lm -lX11
+        endif
+        ifeq ($(UNAMEOS),FreeBSD)
+            PLATFORM_OS = BSD
+        endif
+        ifeq ($(UNAMEOS),OpenBSD)
+            PLATFORM_OS = BSD
+        endif
+        ifeq ($(UNAMEOS),NetBSD)
+            PLATFORM_OS = BSD
+        endif
+        ifeq ($(UNAMEOS),DragonFly)
+            PLATFORM_OS = BSD
+        endif
+        ifeq ($(UNAMEOS),Darwin)
+            PLATFORM_OS = OSX
+			LFLAGS += -framework Foundation -framework Cocoa -framework OpenGL -framework CoreAudio -framework CoreVideo -framework IOKit
+        endif
+    endif
 endif
 
 $(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH)
@@ -38,7 +64,7 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
 	emcc -o $(BIN).html entry.o lib$(BIN).a $(RAYLIB_BIN_PATH) -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
 else
 	zig cc -c entry.c
-	zig cc -c main.zig
+	zig cc -c main.zig $(IFLAGS)
 	zig $(BIN_MODE) --name $(BIN) main.o entry.o $(ZFLAGS) $(IFLAGS) $(LFLAGS)
 endif
 
