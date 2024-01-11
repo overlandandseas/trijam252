@@ -30,31 +30,31 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
 	FINAL_BIN = zrayjam.wasm
 	ZFLAGS += -target wasm32-freestanding --sysroot $(EMSDK_PATH)/upstream/emscripten
 else ifeq ($(PLATFORM),PLATFORM_DESKTOP)
-    ifeq ($(OS),Windows_NT)
-        PLATFORM_OS = WINDOWS
-    else
-        UNAMEOS = $(shell uname)
-        ifeq ($(UNAMEOS),Linux)
-            PLATFORM_OS = LINUX
+	ifeq ($(OS),Windows_NT)
+		PLATFORM_OS = WINDOWS
+	else
+		UNAMEOS = $(shell uname)
+		ifeq ($(UNAMEOS),Linux)
+			PLATFORM_OS = LINUX
 			LFLAGS += -lGL -lrt -ldl -lm -lX11
-        endif
-        ifeq ($(UNAMEOS),FreeBSD)
-            PLATFORM_OS = BSD
-        endif
-        ifeq ($(UNAMEOS),OpenBSD)
-            PLATFORM_OS = BSD
-        endif
-        ifeq ($(UNAMEOS),NetBSD)
-            PLATFORM_OS = BSD
-        endif
-        ifeq ($(UNAMEOS),DragonFly)
-            PLATFORM_OS = BSD
-        endif
-        ifeq ($(UNAMEOS),Darwin)
-            PLATFORM_OS = OSX
+		endif
+		ifeq ($(UNAMEOS),FreeBSD)
+			PLATFORM_OS = BSD
+		endif
+		ifeq ($(UNAMEOS),OpenBSD)
+			PLATFORM_OS = BSD
+		endif
+		ifeq ($(UNAMEOS),NetBSD)
+			PLATFORM_OS = BSD
+		endif
+		ifeq ($(UNAMEOS),DragonFly)
+			PLATFORM_OS = BSD
+		endif
+		ifeq ($(UNAMEOS),Darwin)
+			PLATFORM_OS = OSX
 			LFLAGS += -framework Foundation -framework Cocoa -framework OpenGL -framework CoreAudio -framework CoreVideo -framework IOKit
-        endif
-    endif
+		endif
+	endif
 endif
 
 $(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH)
