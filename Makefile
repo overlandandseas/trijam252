@@ -22,21 +22,20 @@ LFLAGS += -L$(RAYLIB_PATH) -lc -lraylib_$(PLATFORM)
 EFLAGS ?= 
 
 BIN_MODE ?= build-exe
+BIN ?= zrayjam
+FINAL_BIN ?= $(BIN)
 
 ifeq ($(PLATFORM),PLATFORM_WEB)
 	BIN_MODE = build-lib
+	FINAL_BIN = zrayjam.wasm
 	ZFLAGS += -target wasm32-freestanding --sysroot $(EMSDK_PATH)/upstream/emscripten
-#	LFLAGS += -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -s WASM=1 -s USE_WEBGL2=1
 endif
 
-BIN ?= zrayjam
-
-$(BIN): Makefile $(RAYLIB_BIN_PATH)
+$(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH)
 ifeq ($(PLATFORM),PLATFORM_WEB)
 	zig $(BIN_MODE) --name $(BIN) main.zig $(ZFLAGS) $(IFLAGS) $(LFLAGS)
 	emcc -c entry.c
-	#emcc -o ./ok.html entry.o libzrayjam.a ext/raylib/src/libraylib_PLATFORM_WEB.a -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
-	emcc -o $(BIN).html entry.o lib$(BIN).a $(RAYLIB_BIN_PATH) -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
+	emcc -o $(BIN).html entry.o lib$(BIN).a $(RAYLIB_BIN_PATH) -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
 else
 	zig cc -c entry.c
 	zig cc -c main.zig

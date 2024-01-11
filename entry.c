@@ -10,10 +10,10 @@ uintptr_t __stack_chk_guard = 0xABBABABA;
 _Noreturn void __stack_chk_fail(void) { abort(); };
 
 // emsc_main() is the Zig entry function in pacman.zig
-extern void emsc_main(void);
-int main() {
-    emsc_main();
-    return 0;
-}
+// extern void emsc_main(void);
+// int main() {
+//     emsc_main();
+//     return 0;
+// }
 
 // #endif

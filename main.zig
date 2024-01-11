@@ -2,7 +2,7 @@ const ray = @cImport({
     @cInclude("raylib.h");
 });
 
-export fn emsc_main() void {
+pub fn main() void {
     const screenWidth = 800;
     const screenHeight = 450;
 
