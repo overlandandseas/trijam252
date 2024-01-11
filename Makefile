@@ -1,11 +1,12 @@
-
+# include, linker, zig, emcc
 IFLAGS ?=
 LFLAGS ?=
 ZFLAGS ?=
+EFLAGS ?=
 
 ## PLATFORM
 PLATFORM        ?= PLATFORM_DESKTOP
-ZFLAGS += -D$(PLATFORM)
+ZFLAGS          += -D$(PLATFORM)
 
 ## EMSCRIPTEN
 EMSDK_PATH      ?= ~/.emsdk
@@ -19,36 +20,26 @@ RAYLIB_BIN_PATH ?= $(RAYLIB_PATH)/$(RAYLIB_PLAT_BIN)
 IFLAGS += -I$(RAYLIB_PATH)
 LFLAGS += -L$(RAYLIB_PATH) -lc -lraylib_$(PLATFORM)
 
-EFLAGS ?= 
+EFLAGS += -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
 
-BIN_MODE ?= build-exe
+# game name
 BIN ?= zrayjam
+# either zrayjam or zrayjam.wasm
 FINAL_BIN ?= $(BIN)
 
+# platform-specific flags, mostly linkage
 ifeq ($(PLATFORM),PLATFORM_WEB)
-	BIN_MODE = build-lib
 	FINAL_BIN = zrayjam.wasm
 	ZFLAGS += -target wasm32-freestanding --sysroot $(EMSDK_PATH)/upstream/emscripten
 else ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 	ifeq ($(OS),Windows_NT)
 		PLATFORM_OS = WINDOWS
+		LFLAGS += -lopengl32 -lgdi32 -lwinmm -lcomdlg32 -lole32
 	else
 		UNAMEOS = $(shell uname)
 		ifeq ($(UNAMEOS),Linux)
 			PLATFORM_OS = LINUX
 			LFLAGS += -lGL -lrt -ldl -lm -lX11
-		endif
-		ifeq ($(UNAMEOS),FreeBSD)
-			PLATFORM_OS = BSD
-		endif
-		ifeq ($(UNAMEOS),OpenBSD)
-			PLATFORM_OS = BSD
-		endif
-		ifeq ($(UNAMEOS),NetBSD)
-			PLATFORM_OS = BSD
-		endif
-		ifeq ($(UNAMEOS),DragonFly)
-			PLATFORM_OS = BSD
 		endif
 		ifeq ($(UNAMEOS),Darwin)
 			PLATFORM_OS = OSX
@@ -57,17 +48,19 @@ else ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 	endif
 endif
 
+# final artifact
 $(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH)
 ifeq ($(PLATFORM),PLATFORM_WEB)
-	zig $(BIN_MODE) --name $(BIN) main.zig $(ZFLAGS) $(IFLAGS) $(LFLAGS)
 	emcc -c entry.c
-	emcc -o $(BIN).html entry.o lib$(BIN).a $(RAYLIB_BIN_PATH) -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
+	zig build-lib --name $(BIN) main.zig $(ZFLAGS) $(IFLAGS) $(LFLAGS)
+	emcc -o $(BIN).html entry.o lib$(BIN).a $(RAYLIB_BIN_PATH) $(EFLAGS)
 else
 	zig cc -c entry.c
 	zig cc -c main.zig $(IFLAGS)
-	zig $(BIN_MODE) --name $(BIN) main.o entry.o $(ZFLAGS) $(IFLAGS) $(LFLAGS)
+	zig build-exe --name $(BIN) main.o entry.o $(ZFLAGS) $(IFLAGS) $(LFLAGS)
 endif
 
+# libraylib.a -> libraylib_$(PLATFORM).a
 $(RAYLIB_BIN_PATH):
 	make -C $(RAYLIB_PATH) clean
 	make -C $(RAYLIB_PATH)
