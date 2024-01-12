@@ -1,7 +1,6 @@
 const ray = @cImport({
     @cInclude("raylib.h");
     @cInclude("raymath.h");
-    @cDefine("RAYGUI_IMPLEMENTATION", {});
     @cInclude("raygui.h");
 });
 
@@ -148,11 +147,11 @@ pub fn main() !void {
     ray.SetMasterVolume(7);
     ray.SetTargetFPS(60);
 
-    var target = ray.LoadRenderTexture(SCREEN_W / 2, SCREEN_H / 2);
+    const target = ray.LoadRenderTexture(SCREEN_W / 2, SCREEN_H / 2);
     const wher_text = "> Where are you??";
     const late_text = "running late, sry <";
     const fsz = 20;
-    var cam = ray.Camera3D{
+    const cam = ray.Camera3D{
         .position = get_world_pos(.{ .x = 0, .y = 0, .z = 10 }),
         .target = get_world_pos(.{ .x = 0, .y = 0, .z = 0 }),
         .up = .{ .x = 0, .y = 1, .z = 0 },
@@ -161,9 +160,9 @@ pub fn main() !void {
     };
 
     var phone = ray.LoadModel("res/phone.glb");
-    var fail_sound = ray.LoadSound("res/fail.wav");
-    var succ_sound = ray.LoadSound("res/success.wav");
-    var music = ray.LoadMusicStream("res/hit.mod");
+    const fail_sound = ray.LoadSound("res/fail.wav");
+    const succ_sound = ray.LoadSound("res/success.wav");
+    const music = ray.LoadMusicStream("res/hit.mod");
     
     // set seed after load for some entropy
     ray.SetRandomSeed(@intFromFloat(ray.GetTime() * 219613));
@@ -190,9 +189,9 @@ pub fn main() !void {
     set_btns(&bad_btn, &prompt, &btns);
 
     while (!ray.WindowShouldClose()) {
-        var time: f32 = @floatCast(ray.GetTime());
-        var offset = .{ .x = @sin(time / 2) / 10, .y = @sin(time / 3) / 10, .z = @sin(time / 4) / 10 };
-        var pos = get_world_pos(offset);
+        const time: f32 = @floatCast(ray.GetTime());
+        const offset = .{ .x = @sin(time / 2) / 10, .y = @sin(time / 3) / 10, .z = @sin(time / 4) / 10 };
+        const pos = get_world_pos(offset);
         // 3D in target_tex
         ray.BeginTextureMode(target);
         {
@@ -200,12 +199,12 @@ pub fn main() !void {
             ray.BeginMode3D(cam);
             {
                 var mtx = ray.MatrixIdentity();
-                var scl = ray.MatrixScale(3.85, 3.85, 3.85);
-                var rot = ray.MatrixRotate(.{ .x = 0, .y = -1, .z = 0 }, ray.PI / 2);
-                var rtx = ray.MatrixRotate(.{ .x = 0.93, .y = 0, .z = 0 }, @sin(time) * ray.PI / 100);
-                var rty = ray.MatrixRotate(.{ .x = 0, .y = 0.51, .z = 0 }, @sin(time / 2) * ray.PI / 100);
-                var rtz = ray.MatrixRotate(.{ .x = 0, .y = 0, .z = 0.23 }, @sin(time / 3) * ray.PI / 100);
-                var trn = ray.MatrixTranslate(pos.x, pos.y, pos.z);
+                const scl = ray.MatrixScale(3.85, 3.85, 3.85);
+                const rot = ray.MatrixRotate(.{ .x = 0, .y = -1, .z = 0 }, ray.PI / 2);
+                const rtx = ray.MatrixRotate(.{ .x = 0.93, .y = 0, .z = 0 }, @sin(time) * ray.PI / 100);
+                const rty = ray.MatrixRotate(.{ .x = 0, .y = 0.51, .z = 0 }, @sin(time / 2) * ray.PI / 100);
+                const rtz = ray.MatrixRotate(.{ .x = 0, .y = 0, .z = 0.23 }, @sin(time / 3) * ray.PI / 100);
+                const trn = ray.MatrixTranslate(pos.x, pos.y, pos.z);
                 mtx = ray.MatrixMultiply(mtx, scl);
                 mtx = ray.MatrixMultiply(mtx, rot);
                 mtx = ray.MatrixMultiply(mtx, rtx);
@@ -244,15 +243,15 @@ pub fn main() !void {
             // blit 3D to screen
             ray.DrawTexturePro(target.texture, .{ .x = 0, .y = 0, .width = @floatFromInt(target.texture.width), .height = @floatFromInt(target.texture.height) }, .{ .x = 0, .y = 0, .width = SCREEN_W, .height = SCREEN_H }, .{ .x = 0, .y = 0 }, 0.0, ray.WHITE);
 
-            var ox: i32 = @intFromFloat(offset.x * 50);
-            var oy: i32 = @intFromFloat(offset.z * 50);
+            const ox: i32 = @intFromFloat(offset.x * 50);
+            const oy: i32 = @intFromFloat(offset.z * 50);
 
 
             switch (game_state) {
                 GameState.Menu => {
                     // draw default texts
                     ray.DrawText(wher_text, SCREEN_W / 2 - 120 + ox, 75 + oy, fsz, ray.YELLOW);
-                    var w = ray.MeasureText(wher_text, fsz);
+                    const w = ray.MeasureText(wher_text, fsz);
                     ray.DrawText(late_text, SCREEN_W / 2 + 120 - w + ox, 105 + oy, fsz, ray.WHITE);
 
                     // start game
@@ -357,7 +356,7 @@ pub fn main() !void {
 
                             ray.DrawText("> Forget it...", SCREEN_W / 2 - 120 + ox, 75 + oy, fsz, ray.YELLOW);
 
-                            var w: f32 = @floatFromInt(ray.MeasureText("TOO LATE!!", 60));
+                            const w: f32 = @floatFromInt(ray.MeasureText("TOO LATE!!", 60));
                             ray.DrawTextPro(
                                 ray.GetFontDefault(),
                                 "TOO LATE!!",

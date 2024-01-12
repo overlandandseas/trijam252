@@ -63,7 +63,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   Copyright (c) 2013-2023 Ramon Santamaria (@raysan5) and contributors
+*   Copyright (c) 2013-2024 Ramon Santamaria (@raysan5) and contributors
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -1192,8 +1192,8 @@ VrStereoConfig LoadVrStereoConfig(VrDeviceInfo device)
         // NOTE: Camera movement might seem more natural if we model the head.
         // Our axis of rotation is the base of our head, so we might want to add
         // some y (base of head to eye level) and -z (center of head to eye protrusion) to the camera positions.
-        config.viewOffset[0] = MatrixTranslate(-device.interpupillaryDistance*0.5f, 0.075f, 0.045f);
-        config.viewOffset[1] = MatrixTranslate(device.interpupillaryDistance*0.5f, 0.075f, 0.045f);
+        config.viewOffset[0] = MatrixTranslate(device.interpupillaryDistance*0.5f, 0.075f, 0.045f);
+        config.viewOffset[1] = MatrixTranslate(-device.interpupillaryDistance*0.5f, 0.075f, 0.045f);
 
         // Compute eyes Viewports
         /*
@@ -2480,13 +2480,10 @@ AutomationEventList LoadAutomationEventList(const char *fileName)
 }
 
 // Unload automation events list from file
-void UnloadAutomationEventList(AutomationEventList *list)
+void UnloadAutomationEventList(AutomationEventList list)
 {
 #if defined(SUPPORT_AUTOMATION_EVENTS)
-    RL_FREE(list->events);
-    list->events = NULL;
-    list->count = 0;
-    list->capacity = 0;
+    RL_FREE(list.events);
 #endif
 }
 
@@ -2623,8 +2620,9 @@ void PlayAutomationEvent(AutomationEvent event)
             {
                 CORE.Input.Gamepad.axisState[event.params[0]][event.params[1]] = ((float)event.params[2]/32768.0f);
             } break;
+    #if defined(SUPPORT_GESTURES_SYSTEM)
             case INPUT_GESTURE: GESTURES.current = event.params[0]; break;     // param[0]: gesture (enum Gesture) -> rgestures.h: GESTURES.current
-
+    #endif
             // Window event
             case WINDOW_CLOSE: CORE.Window.shouldClose = true; break;
             case WINDOW_MAXIMIZE: MaximizeWindow(); break;
@@ -2632,11 +2630,13 @@ void PlayAutomationEvent(AutomationEvent event)
             case WINDOW_RESIZE: SetWindowSize(event.params[0], event.params[1]); break;
 
             // Custom event
+    #if defined(SUPPORT_SCREEN_CAPTURE)
             case ACTION_TAKE_SCREENSHOT:
             {
                 TakeScreenshot(TextFormat("screenshot%03i.png", screenshotCounter));
                 screenshotCounter++;
             } break;
+    #endif
             case ACTION_SETTARGETFPS: SetTargetFPS(event.params[0]); break;
             default: break;
         }
@@ -3265,7 +3265,7 @@ static void ScanDirectoryFilesRecursively(const char *basePath, FilePathList *fi
 
 #if defined(SUPPORT_AUTOMATION_EVENTS)
 // Automation event recording
-// NOTE: Recording is by default done at EndDrawing(), after PollInputEvents()
+// NOTE: Recording is by default done at EndDrawing(), before PollInputEvents()
 static void RecordAutomationEvent(void)
 {
     // Checking events in current frame and save them into currentEventList
@@ -3507,6 +3507,7 @@ static void RecordAutomationEvent(void)
     }
     //-------------------------------------------------------------------------------------
 
+#if defined(SUPPORT_GESTURES_SYSTEM)
     // Gestures input currentEventList->events recording
     //-------------------------------------------------------------------------------------
     if (GESTURES.current != GESTURE_NONE)
@@ -3524,6 +3525,7 @@ static void RecordAutomationEvent(void)
         if (currentEventList->count == currentEventList->capacity) return;    // Security check
     }
     //-------------------------------------------------------------------------------------
+#endif
 
     // Window events recording
     //-------------------------------------------------------------------------------------

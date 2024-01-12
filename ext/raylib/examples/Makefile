@@ -21,7 +21,7 @@
 #     > PLATFORM_ANDROID:
 #         - Android (ARM, ARM64)
 #
-#   Copyright (c) 2013-2023 Ramon Santamaria (@raysan5)
+#   Copyright (c) 2013-2024 Ramon Santamaria (@raysan5)
 #
 #   This software is provided "as-is", without any express or implied warranty. In no event
 #   will the authors be held liable for any damages arising from the use of this software.
@@ -490,6 +490,7 @@ TEXTURES = \
     textures/textures_gif_player \
     textures/textures_image_drawing \
     textures/textures_image_generation \
+    textures/textures_image_kernel \
     textures/textures_image_loading \
     textures/textures_image_processing \
     textures/textures_image_rotate \
@@ -559,6 +560,7 @@ SHADERS = \
     shaders/shaders_palette_switch \
     shaders/shaders_postprocessing \
     shaders/shaders_raymarching \
+    shaders/shaders_shadowmap \
     shaders/shaders_shapes_textures \
     shaders/shaders_simple_mask \
     shaders/shaders_spotlight \
