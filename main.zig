@@ -22,12 +22,27 @@ pub fn main() void {
         .fovy = 45,
         .projection = ray.CAMERA_PERSPECTIVE,
     };
+
     var cube_msh = ray.GenMeshCube(1, 1, 1);
-    var cube_tex = ray.LoadTextureFromImage(ray.GenImageColor(1, 1, ray.GREEN));
-    var cube_mat = ray.LoadMaterialDefault();
-    cube_mat.maps[ray.MATERIAL_MAP_DIFFUSE].texture = cube_tex;
+    var mod = ray.LoadModelFromMesh(cube_msh);
 
     while (!ray.WindowShouldClose()) {
+        if (ray.IsKeyDown(ray.KEY_W)) {
+            cam.position.y += 1 * ray.GetFrameTime();
+            cam.target.y += 1 * ray.GetFrameTime();
+        }
+        if (ray.IsKeyDown(ray.KEY_S)) {
+            cam.position.y -= 1 * ray.GetFrameTime();
+            cam.target.y -= 1 * ray.GetFrameTime();
+        }
+        if (ray.IsKeyDown(ray.KEY_A)) {
+            cam.position.z -= 1 * ray.GetFrameTime();
+            cam.target.z -= 1 * ray.GetFrameTime();
+        }
+        if (ray.IsKeyDown(ray.KEY_D)) {
+            cam.position.z += 1 * ray.GetFrameTime();
+            cam.target.z += 1 * ray.GetFrameTime();
+        }
 
         // 3D in target_tex
         ray.BeginTextureMode(target);
@@ -41,7 +56,11 @@ pub fn main() void {
                 var trn = ray.MatrixTranslate(5 + @sin(time / 2), 5 + @sin(time / 3), 5 + @sin(time / 4));
                 mtx = ray.MatrixMultiply(mtx, rot);
                 mtx = ray.MatrixMultiply(mtx, trn);
-                ray.DrawMesh(cube_msh, cube_mat, mtx);
+
+                ray.DrawGrid(10, 10);
+                mod.transform = mtx;
+                ray.DrawModel(mod, .{}, 1, ray.GREEN);
+                ray.DrawModelWires(mod, .{}, 1, ray.DARKGREEN);
             }
             ray.EndMode3D();
         }
