@@ -1,3 +1,11 @@
+### running late, sry
+
+This is my entry for Trijam #252. I wanted to try a fast jam, and give zig a spin.
+
+### disclaimer
+
+this doesn't work great. the wasm build didn't seem to support zig's heap page allocator. I changed the `sprintf`'s to use an existing buffer on the stack, but that now seems to make the desktop build segfault :/
+
 
 ### Build Req
 

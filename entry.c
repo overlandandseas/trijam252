@@ -7,3 +7,4 @@
 // which don't seem to be provided by the emscripten toolchain(?)
 uintptr_t __stack_chk_guard = 0xABBABABA;
 _Noreturn void __stack_chk_fail(void) { abort(); };
+int errno;

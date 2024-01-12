@@ -20,7 +20,7 @@ RAYLIB_BIN_PATH ?= $(RAYLIB_PATH)/$(RAYLIB_PLAT_BIN)
 IFLAGS += -I$(RAYLIB_PATH)
 LFLAGS += -L$(RAYLIB_PATH) -lc -lraylib_$(PLATFORM)
 
-EFLAGS += -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell --preload-file res
+EFLAGS += -O3 -s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=256MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell --preload-file res
 
 # game name
 BIN ?= zrayjam
@@ -30,7 +30,7 @@ FINAL_BIN ?= $(BIN)
 # platform-specific flags, mostly linkage
 ifeq ($(PLATFORM),PLATFORM_WEB)
 	FINAL_BIN = zrayjam.wasm
-	ZFLAGS += -target wasm32-freestanding --sysroot $(EMSDK_PATH)/upstream/emscripten
+	ZFLAGS += -target wasm32-wasi --sysroot $(EMSDK_PATH)/upstream/emscripten
 else ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 	ifeq ($(OS),Windows_NT)
 		PLATFORM_OS = WINDOWS
@@ -52,7 +52,7 @@ endif
 $(FINAL_BIN): Makefile $(RAYLIB_BIN_PATH) main.zig
 ifeq ($(PLATFORM),PLATFORM_WEB)
 	emcc -c entry.c
-	zig build-lib --name $(BIN) main.zig $(ZFLAGS) $(IFLAGS) $(LFLAGS)
+	zig build-lib --name $(BIN) $(IFLAGS) $(ZFLAGS) $(LFLAGS) main.zig 
 	emcc -o $(BIN).html entry.o lib$(BIN).a $(RAYLIB_BIN_PATH) $(EFLAGS)
 else
 	zig cc -c entry.c
@@ -62,6 +62,7 @@ endif
 
 # libraylib.a -> libraylib_$(PLATFORM).a
 $(RAYLIB_BIN_PATH):
+	echo $(RAYLIB_BIN_PATH)
 	make -C $(RAYLIB_PATH) clean
 	make -C $(RAYLIB_PATH)
 	mv $(RAYLIB_PATH)/$(RAYLIB_BIN) $(RAYLIB_PATH)/$(RAYLIB_PLAT_BIN)
