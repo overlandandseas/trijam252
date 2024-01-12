@@ -20,7 +20,7 @@ RAYLIB_BIN_PATH ?= $(RAYLIB_PATH)/$(RAYLIB_PLAT_BIN)
 IFLAGS += -I$(RAYLIB_PATH)
 LFLAGS += -L$(RAYLIB_PATH) -lc -lraylib_$(PLATFORM)
 
-EFLAGS += -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell
+EFLAGS += -s ASYNCIFY -s USE_GLFW=3 -s TOTAL_MEMORY=128MB -s FORCE_FILESYSTEM=1 -DPLATFORM_WEB --shell-file minshell --preload-file res
 
 # game name
 BIN ?= zrayjam
